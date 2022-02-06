@@ -10,7 +10,13 @@ The app is not ready for end-user.  But this will be happening soon.
 
 ## Contributing
 
-As of now play with my code as you wish and give me a pull request.
+My Intention is to release this app in F-droid. 
+
+Please don't use any libray that is not compatiable with GPL 3.
+
+![1644144134716.png](image/README/1644144134716.png)
+
+Source [https://www.gnu.org/licenses/quick-guide-gplv3.en.html](https://www.gnu.org/licenses/quick-guide-gplv3.en.html)
 
 **this website could be helpful [https://api.mail.tm](https://api.mail.tm)**
 

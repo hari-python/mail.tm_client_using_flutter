@@ -5,7 +5,11 @@ import 'package:flutter/material.dart';
 import '../API/Accounts.dart';
 
 int a = 0;
-List<Account>? myAccounts;
+int currentPage = 0, lastPage = 0;
+List<Account> myAccounts = [];
+int numberOfMails() {
+  return myAccounts.isEmpty ? 0 : myAccounts[0].mails.length;
+}
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -51,22 +55,21 @@ class _HomeScreenState extends State<HomeScreen> {
                   .show(context);
             },
             child: Row(
-              children: const[
-                 Icon(
+              children: const [
+                Icon(
                   Icons.mail_outline,
                   color: Colors.white,
                 ),
-                 SizedBox(
+                SizedBox(
                   width: 7,
                 ),
-                 Text(
+                Text(
                   "example@mail.tm",
                   style: TextStyle(color: Colors.white),
                 ),
               ],
             )),
       ),
-      floatingActionButton: FloatingActionButton(onPressed: () {}),
       drawer: Drawer(
         elevation: 0,
         backgroundColor: Colors.amber,
@@ -103,7 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
               },
               child: const ListTile(
                 leading: Icon(Icons.add),
-                title: Text("New account"),
+                title: Text("Login"),
               ),
             ),
             TextButton(
@@ -122,7 +125,9 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Container(
             color: Colors.grey[100],
-            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+            padding: EdgeInsets.symmetric(
+                horizontal: MediaQuery.of(context).size.width > 800 ? 40 : 5,
+                vertical: 20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -142,50 +147,66 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Column(
                       children: [
                         ...List.generate(
-                          50,
+                          myAccounts.isEmpty ? 0 : myAccounts[0].mails.length,
                           (index) => EmailListItem(
-                            emailAddress: 'sender@example.com',
-                            emailBody: 'Email body',
-                            emailSubject: "Subject goes here",
-                            name: "Sender $index",
+                            emailAddress: myAccounts[0].mails[index]["from"]
+                                ["address"],
+                            emailBody: myAccounts[0].mails[index]["intro"],
+                            emailSubject: myAccounts[0].mails[index]["subject"],
+                            name: myAccounts[0].mails[index]["from"]["name"],
                           ),
                         ),
                         const Divider(
                           height: 30,
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            TextButton(
-                              onPressed: () {},
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: const [
-                                   Icon(Icons.arrow_back),
-                                   SizedBox(
-                                    width: 5,
-                                  ),
-                                   Text("Previous")
-                                ],
+                        if (currentPage != 0)
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              TextButton(
+                                onPressed: () async {
+                                  if (currentPage > 1) {
+                                    currentPage--;
+                                    await myAccounts[0]
+                                        .getMails(page: currentPage);
+                                    setState(() {});
+                                  }
+                                },
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: const [
+                                    Icon(Icons.arrow_back),
+                                    SizedBox(
+                                      width: 5,
+                                    ),
+                                    Text("Previous")
+                                  ],
+                                ),
                               ),
-                            ),
-                            TextButton(
-                              onPressed: () {},
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: const[
-                                   Text("Next"),
-                                   SizedBox(
-                                    width: 5,
-                                  ),
-                                   Icon(Icons.arrow_forward),
-                                ],
+                              TextButton(
+                                onPressed: () async {
+                                  if (currentPage < lastPage) {
+                                    currentPage++;
+                                    await myAccounts[0]
+                                        .getMails(page: currentPage);
+                                    setState(() {});
+                                  }
+                                },
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: const [
+                                    Text("Next"),
+                                    SizedBox(
+                                      width: 5,
+                                    ),
+                                    Icon(Icons.arrow_forward),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
+                            ],
+                          ),
                       ],
                     ),
                   ),
@@ -263,16 +284,27 @@ class _HomeScreenState extends State<HomeScreen> {
                           height: 20,
                         ),
                         ElevatedButton(
-                          onPressed: () {
+                          onPressed: () async {
+                            currentPage = 1;
+                            log(myAccounts.length.toString());
                             var newAccount = Account.create(
-                                username: username, password: password);
-                            myAccounts?.add(newAccount);
+                              username: username,
+                              password: password,
+                            );
+                            await newAccount.getDomain();
+                            newAccount.createDefaultPayload();
+                            // await newAccount.createAccount();
+                            await newAccount.getTokenAndId();
+                            await newAccount.getMails(page: currentPage);
+                            myAccounts.add(newAccount);
                             showLogin = false;
+                            lastPage = myAccounts[0].lastPage;
                             setState(
                               () {},
                             );
+                            log(myAccounts.toString());
                           },
-                          child: const Text("Create"),
+                          child: const Text("Login"),
                         ),
                         const Divider(),
                       ],
@@ -374,55 +406,71 @@ class EmailListItem extends StatelessWidget {
             children: [
               Flexible(
                 flex: 1,
+                fit: FlexFit.tight,
                 child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     EmailAvatar(
                       colour: Colors.green,
-                      textString: name[0],
+                      textString: name == "" ? "#" : name[0],
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 15),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            name,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(
-                            height: 5,
-                          ),
-                          Text(
-                            emailAddress,
-                            overflow: TextOverflow.ellipsis,
-                          )
-                        ],
-                      ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          name,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.mark_email_read),
+                            Container(
+                              constraints: BoxConstraints(maxWidth: 200),
+                              child: Text(
+                                emailAddress + emailSubject,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        )
+                      ],
                     )
                   ],
                 ),
               ),
+              Container(),
               if (MediaQuery.of(context).size.width > 800)
                 Flexible(
+                  fit: FlexFit.tight,
+                  flex: 1,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisSize: MainAxisSize.max,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            emailSubject,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(
-                            height: 5,
-                          ),
-                          Text(
-                            emailBody,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              emailSubject,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                            const SizedBox(
+                              height: 5,
+                            ),
+                            Text(
+                              emailBody,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
                       ),
                       const Icon(Icons.arrow_forward_ios)
                     ],

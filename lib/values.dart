@@ -32,12 +32,12 @@ class MyUrls {
     domain = server + "domains";
     token = server + "token";
     accounts = server + "accounts";
+    messages = server + "messages";
+    usedSpace = server + "me";
   }
 
   createVariablesWithId(String server, String id) {
     createVariablesWithoutId(server);
-    usedSpace = server + "me";
-    messages = server + "messages";
     deleteAccount = "$accounts/$id";
     sources = "$server/sources/$id";
   }
