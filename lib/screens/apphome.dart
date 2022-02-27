@@ -10,9 +10,7 @@ import 'package:flutter/material.dart';
 int a = 0;
 int currentPage = 0, lastPage = 0;
 List<Account> myAccounts = [];
-int numberOfMails() {
-  return myAccounts.isEmpty ? 0 : myAccounts[0].mails.length;
-}
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({

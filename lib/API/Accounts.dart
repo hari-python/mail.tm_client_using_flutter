@@ -3,8 +3,6 @@ import 'package:dio/dio.dart' as diolib;
 import 'dart:convert' as convert;
 import 'package:mailtm_client/values.dart';
 
-// import 'package:requests/requests.dart' as re;
-
 class Account {
   late MyUrls myUrls = MyUrls.withoutId(isMailtm: isMailtm);
   final MyHeaders myHeaders = MyHeaders();
@@ -14,56 +12,25 @@ class Account {
   List mails = [];
   late int lastPage;
 
+  Account({required this.username, required this.password, this.isMailtm = true});
+
   Account.existing(
       {required this.username, required this.password, this.isMailtm = true});
-  //     {
-  //   getDomain().whenComplete(
-  //     () {
-  //       createDefaultPayload();
-  //       getTokenAndId().whenComplete(
-  //         () {
-  //           myUrls = MyUrls.withId(id: id, isMailtm: isMailtm);
-  //           getMails();
-  //         },
-  //       );
-  //     },
-  //   );
-  // }
 
-  /// Creates a new account
-  /// Do not call create account
   Account.create(
       {required this.username, required this.password, this.isMailtm = true});
-  //     {
-  //   getDomain().whenComplete(
-  //     () {
-  //       createDefaultPayload();
-  //       createAccount().whenComplete(
-  //         () {
-  //           getTokenAndId().whenComplete(
-  //             () {
-  //               myUrls = MyUrls.withId(id: id, isMailtm: isMailtm);
-  //             },
-  //           );
-  //         },
-  //       );
-  //     },
-  //   );
-  // }
-
-  createDefaultPayload({then}) {
+ 
+  createDefaultPayload() {
     log("createDefaultPayload");
     if (!username.contains("@")) {
       username = username + "@" + domain;
     }
     defaultPayload =
         convert.json.encode({'address': username, 'password': password});
-    if (then != null) {
-      then();
-    }
+   
   }
 
-  Future createAccount({then}) async {
+  Future createAccount() async {
     log("createAccount");
     diolib.Response response = await diolib.Dio().post(
       myUrls.accounts,
@@ -74,16 +41,10 @@ class Account {
     );
     Map body = convert.jsonDecode(response.data);
     id = body["id"];
-    if (then != null) {
-      then();
-    }
+   
   }
 
-  // String test() {
-  //   return 'worked';
-  // }
-
-  Future getDomain({then}) async {
+  Future getDomain() async {
     log("beta");
     diolib.Response response = await diolib.Dio().get(
       myUrls.domain,
@@ -94,12 +55,10 @@ class Account {
     Map data = convert.jsonDecode(response.data);
     domain = data["hydra:member"][0]["domain"];
     log("domain assigned");
-    if (then != null) {
-      then();
-    }
+   
   }
 
-  Future getTokenAndId({then}) async {
+  Future getTokenAndId() async {
     log("getID token");
     diolib.Response response = await diolib.Dio().post(
       myUrls.token,
@@ -111,22 +70,18 @@ class Account {
     token = response.data["token"];
     id = response.data["id"];
     myHeaders.getheader["Authorization"] = "Bearer $token";
-    if (then != null) {
-      then();
-    }
+    
   }
 
-  Future deleteAccount({then}) async {
+  Future deleteAccount() async {
     log("deleteAccounts");
     await diolib.Dio().delete(
       myUrls.deleteAccount,
     );
-    if (then != null) {
-      then();
-    }
+    
   }
 
-  Future getMails({required int page, then}) async {
+  Future getMails({required int page}) async {
     log("getmails");
     log(myHeaders.getheader.toString());
     diolib.Response response = await diolib.Dio().get(
@@ -135,19 +90,15 @@ class Account {
         headers: myHeaders.getheader,
       ),
     );
-    log(response.data);
     mails = convert.jsonDecode(response.data)["hydra:member"];
     String lastPageUrl =
         convert.jsonDecode(response.data)["hydra:view"]["hydra:last"];
     lastPage = int.parse(lastPageUrl[lastPageUrl.length - 1]);
 
-    if (then != null) {
-      then();
-    }
+  
   }
 
   // Future getAllMails() async {
-
   //   do {
   //     getMails();
   //   } while (false);

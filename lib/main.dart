@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:mailtm_client/API/allaccount.dart';
+
 import 'package:mailtm_client/screens/apphome.dart';
 // import 'API/Accounts.dart';
 
@@ -12,8 +14,23 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     
-    return const MaterialApp(
-      home: HomeScreen(),
+    return  MaterialApp(
+      home: MotherWidget(child: const HomeScreen()),
+      debugShowMaterialGrid: false,
+      debugShowCheckedModeBanner: false,
+      showSemanticsDebugger: false,
     );
   }
+}
+class MotherWidget extends InheritedWidget {
+
+  MotherWidget({Key? key,required Widget child}) : super(child: child,key: key);
+  final AllAccounts account = AllAccounts();
+
+  @override
+  bool updateShouldNotify(covariant InheritedWidget oldWidget) =>true;
+  static MotherWidget of(BuildContext context){
+    return context.dependOnInheritedWidgetOfExactType<MotherWidget>()!;
+    }
+
 }
