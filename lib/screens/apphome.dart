@@ -1,8 +1,11 @@
 import 'dart:developer';
-import 'dart:math' hide log;
+import 'package:mailtm_client/API/Accounts.dart';
+import 'package:mailtm_client/logic/randomstring.dart';
+import 'package:mailtm_client/screens/custom/emailavatar.dart';
+import 'package:mailtm_client/screens/custom/emailitem.dart';
 import 'package:motion_toast/motion_toast.dart';
 import 'package:flutter/material.dart';
-import '../API/Accounts.dart';
+
 
 int a = 0;
 int currentPage = 0, lastPage = 0;
@@ -319,11 +322,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-String generateRandomString(int len) {
-  var r = Random();
-  const _chars = 'abcdefghiklmnopqrstuvwxyz1234567890';
-  return List.generate(len, (index) => _chars[r.nextInt(_chars.length)]).join();
-}
+
 
 // class MyDrawer extends StatelessWidget {
 //   const MyDrawer({
@@ -382,131 +381,8 @@ String generateRandomString(int len) {
 //   }
 // }
 
-class EmailListItem extends StatelessWidget {
-  const EmailListItem({
-    Key? key,
-    required this.name,
-    required this.emailAddress,
-    required this.emailBody,
-    required this.emailSubject,
-  }) : super(key: key);
-  final String name, emailAddress, emailBody, emailSubject;
 
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        TextButton(
-          style: TextButton.styleFrom(
-            padding: const EdgeInsets.all(30),
-            backgroundColor: Colors.white,
-          ),
-          onPressed: () {},
-          child: Row(
-            children: [
-              Flexible(
-                flex: 1,
-                fit: FlexFit.tight,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    EmailAvatar(
-                      colour: Colors.green,
-                      textString: name == "" ? "#" : name[0],
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          name,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.mark_email_read),
-                            Container(
-                              constraints: BoxConstraints(maxWidth: 200),
-                              child: Text(
-                                emailAddress + emailSubject,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        )
-                      ],
-                    )
-                  ],
-                ),
-              ),
-              Container(),
-              if (MediaQuery.of(context).size.width > 800)
-                Flexible(
-                  fit: FlexFit.tight,
-                  flex: 1,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              emailSubject,
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                            ),
-                            const SizedBox(
-                              height: 5,
-                            ),
-                            Text(
-                              emailBody,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ),
-                      ),
-                      const Icon(Icons.arrow_forward_ios)
-                    ],
-                  ),
-                )
-            ],
-          ),
-        ),
-        const Divider(
-          height: 2,
-          color: Colors.black12,
-        ),
-      ],
-    );
-  }
-}
 
-class EmailAvatar extends StatelessWidget {
-  const EmailAvatar({
-    Key? key,
-    required this.colour,
-    required this.textString,
-  }) : super(key: key);
-  final Color colour;
-  final String textString;
 
-  @override
-  Widget build(BuildContext context) {
-    return CircleAvatar(
-      backgroundColor: colour,
-      child: Center(
-        child: Text(
-          textString,
-          style: const TextStyle(color: Colors.white),
-        ),
-      ),
-    );
-  }
-}
+
+
