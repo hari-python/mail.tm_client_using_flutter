@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mailtm_client/API/allaccount.dart';
+import 'package:mailtm_client/logic/routes.dart';
 
 import 'package:mailtm_client/screens/apphome.dart';
 // import 'API/Accounts.dart';
@@ -15,6 +16,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     
     return  MaterialApp(
+      initialRoute: RouteGenerator.homePage,
+      onGenerateRoute: RouteGenerator.generateRoute,
       home: MotherWidget(child: const HomeScreen()),
       debugShowMaterialGrid: false,
       debugShowCheckedModeBanner: false,
@@ -22,7 +25,7 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-class MotherWidget extends InheritedWidget {
+class MotherWidget extends InheritedWidget {  
 
   MotherWidget({Key? key,required Widget child}) : super(child: child,key: key);
   final AllAccounts account = AllAccounts();

@@ -1,16 +1,15 @@
 import 'dart:developer';
 import 'package:mailtm_client/API/Accounts.dart';
 import 'package:mailtm_client/logic/randomstring.dart';
-import 'package:mailtm_client/screens/custom/emailavatar.dart';
+import 'package:mailtm_client/logic/smallclasses.dart';
+import 'package:mailtm_client/screens/custom/appbar.dart';
 import 'package:mailtm_client/screens/custom/emailitem.dart';
-import 'package:motion_toast/motion_toast.dart';
+import 'package:mailtm_client/screens/custom/mydrawer.dart';
 import 'package:flutter/material.dart';
-
 
 int a = 0;
 int currentPage = 0, lastPage = 0;
 List<Account> myAccounts = [];
-
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -28,100 +27,21 @@ class _HomeScreenState extends State<HomeScreen> {
   TextEditingController? passwordEditingController;
   TextEditingController? usernameEditingController;
 
+  Function showLoginFunc(Function setState) => (bool value) {
+        showLogin = value;
+        setState(() {});
+      };
+
   @override
   Widget build(BuildContext context) {
     // Scaffold.of(context).openDrawer();
 
     log("this is a logged message $a");
+
     a++;
     return Scaffold(
-      appBar: AppBar(
-        actions: [
-          TextButton(
-            onPressed: () {},
-            child: const EmailAvatar(
-              textString: "LE",
-              colour: Colors.black,
-            ),
-          ),
-        ],
-        title: TextButton(
-            onPressed: () {
-              MotionToast(
-                      primaryColor: Colors.yellow,
-                      icon: Icons.done,
-                      title: const Text("Value"),
-                      description: const Text("copied to clipboard"),
-                      width: 350)
-                  .show(context);
-            },
-            child: Row(
-              children: const [
-                Icon(
-                  Icons.mail_outline,
-                  color: Colors.white,
-                ),
-                SizedBox(
-                  width: 7,
-                ),
-                Text(
-                  "example@mail.tm",
-                  style: TextStyle(color: Colors.white),
-                ),
-              ],
-            )),
-      ),
-      drawer: Drawer(
-        elevation: 0,
-        backgroundColor: Colors.amber,
-        child: ListView(
-          children: [
-            const DrawerHeader(
-              child: Text(""),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const ListTile(
-                leading: Icon(Icons.inbox_outlined),
-                title: Text("Inbox"),
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const ListTile(
-                leading: Icon(Icons.refresh),
-                title: Text("Refresh"),
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                if (showLogin == false) {
-                  showLogin = true;
-                  setState(() {});
-                }
-              },
-              child: const ListTile(
-                leading: Icon(Icons.add),
-                title: Text("Login"),
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const ListTile(
-                leading: Icon(Icons.auto_awesome_sharp),
-                title: Text("About"),
-              ),
-            ),
-          ],
-        ),
-      ),
+      appBar: myAppBar(context),
+      drawer: myDrawer(context, showLoginFunc(setState), showLogin),
       body: Stack(
         children: [
           Container(
@@ -132,39 +52,63 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  "Inbox",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 30,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Inbox",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 30,
+                      ),
+                    ),
+                    Text(
+                      "Page $currentPage",
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 30,
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(
                   height: 5,
                 ),
                 Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    child: Column(
-                      children: [
-                        ...List.generate(
-                          myAccounts.isEmpty ? 0 : myAccounts[0].mails.length,
-                          (index) => EmailListItem(
-                            emailAddress: myAccounts[0].mails[index]["from"]
-                                ["address"],
-                            emailBody: myAccounts[0].mails[index]["intro"],
-                            emailSubject: myAccounts[0].mails[index]["subject"],
-                            name: myAccounts[0].mails[index]["from"]["name"],
-                          ),
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: ListView.builder(
+                          itemBuilder: (BuildContext context, int index) {
+                            var myTokenID = TokenID(
+                              token: myAccounts[0].token,
+                              id: myAccounts[0].mails[index]["id"],
+                            );
+                            return EmailListItem(
+                              emailAddress: myAccounts[0].mails[index]["from"]
+                                  ["address"],
+                              emailBody: myAccounts[0].mails[index]["intro"],
+                              emailSubject: myAccounts[0].mails[index]
+                                  ["subject"],
+                              name: myAccounts[0].mails[index]["from"]["name"],
+                              details: myTokenID,
+                            );
+                          },
+                          itemCount: myAccounts.isEmpty
+                              ? 0
+                              : myAccounts[0].mails.length,
                         ),
-                        const Divider(
-                          height: 30,
-                        ),
-                        if (currentPage != 0)
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              TextButton(
+                      ),
+                      const Divider(
+                        height: 30,
+                      ),
+                      if (currentPage != 0)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Visibility(
+                              visible: currentPage > 1,
+                              child: TextButton(
                                 onPressed: () async {
                                   if (currentPage > 1) {
                                     currentPage--;
@@ -181,11 +125,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                     SizedBox(
                                       width: 5,
                                     ),
-                                    Text("Previous")
+                                    Text("Previous Page")
                                   ],
                                 ),
                               ),
-                              TextButton(
+                            ),
+                            Visibility(
+                              visible: currentPage < lastPage,
+                              child: TextButton(
                                 onPressed: () async {
                                   if (currentPage < lastPage) {
                                     currentPage++;
@@ -198,7 +145,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceEvenly,
                                   children: const [
-                                    Text("Next"),
+                                    Text("Next Page"),
                                     SizedBox(
                                       width: 5,
                                     ),
@@ -206,10 +153,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ],
                                 ),
                               ),
-                            ],
-                          ),
-                      ],
-                    ),
+                            ),
+                          ],
+                        ),
+                    ],
                   ),
                 ),
               ],
@@ -378,9 +325,4 @@ class _HomeScreenState extends State<HomeScreen> {
 //     );
 //   }
 // }
-
-
-
-
-
-
+// 

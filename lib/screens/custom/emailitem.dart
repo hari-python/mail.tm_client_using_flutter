@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:mailtm_client/logic/routes.dart';
+import 'package:mailtm_client/logic/smallclasses.dart';
 import 'package:mailtm_client/screens/custom/emailavatar.dart';
 
 class EmailListItem extends StatelessWidget {
@@ -8,8 +10,10 @@ class EmailListItem extends StatelessWidget {
     required this.emailAddress,
     required this.emailBody,
     required this.emailSubject,
+    required this.details
   }) : super(key: key);
   final String name, emailAddress, emailBody, emailSubject;
+  final TokenID details;
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +24,9 @@ class EmailListItem extends StatelessWidget {
             padding: const EdgeInsets.all(30),
             backgroundColor: Colors.white,
           ),
-          onPressed: () {},
+          onPressed: () {
+            Navigator.of(context).pushNamed(RouteGenerator.viewMail,arguments: details);
+          },
           child: Row(
             children: [
               Flexible(
