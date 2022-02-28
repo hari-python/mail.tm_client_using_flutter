@@ -1,19 +1,17 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:mailtm_client/logic/smallclasses.dart';
 import 'package:mailtm_client/values.dart';
 
 class DownloadMail {
   var headers = MyHeaders();
-  var downloadedMail= <String,String>{
-    "body":"",
-
-  };
+  
   final String id;
   String token;
   DownloadMail({required this.id, required this.token});
 
-  Future<Map<String,String>> download() async {
+  Future<MailDetails> download() async {
     headers.getheader["Authorization"] = "Bearer $token";
     var url = 'https://api.mail.tm/messages/$id';
 
@@ -21,8 +19,11 @@ class DownloadMail {
       url,
       options: Options(headers: headers.getheader),
     );
-    downloadedMail["body"]=jsonDecode(response.data)["html"][0];
-    return downloadedMail;
+    
+    var mailDetails = MailDetails(jsonDecode(response.data));
+    
+
+    return mailDetails;
 
   }
 }
