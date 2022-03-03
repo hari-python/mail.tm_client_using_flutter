@@ -28,13 +28,19 @@ class _MailScreenState extends State<MailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    var platform = Theme.of(context).platform;
-    widget.downloadMail.then((value) {
+    int a = 0;
+    try {
+      widget.downloadMail.then((value) {
       mailDetails = value;
       showMail = true;
-      log("done alpha rendering 2000");
+      log("done alpha rendering ${a++}");
+
       setState(() {});
     });
+    } catch (e) {
+      log(e.toString());
+    }
+    
     return SafeArea(
       child: Scaffold(
         body: Container(
@@ -51,7 +57,9 @@ class _MailScreenState extends State<MailScreen> {
                       icon: const Icon(Icons.arrow_back_ios),
                       label: const Text("back"))
                 ],
+                
               ),
+              const Divider(),
               if (showMail)
                 Expanded(
                   child: SingleChildScrollView(

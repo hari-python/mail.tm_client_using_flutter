@@ -46,9 +46,12 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Container(
             color: Colors.grey[100],
-            padding: EdgeInsets.symmetric(
-                horizontal: MediaQuery.of(context).size.width > 800 ? 40 : 5,
-                vertical: 20),
+            padding: EdgeInsets.fromLTRB(
+                MediaQuery.of(context).size.width > 800 ? 40 : 5,
+               5,
+                MediaQuery.of(context).size.width > 800 ? 40 : 5,
+                5,
+                ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -100,7 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       const Divider(
-                        height: 30,
+                        height: 1,
                       ),
                       if (currentPage != 0)
                         Row(

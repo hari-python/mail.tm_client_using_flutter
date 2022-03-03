@@ -15,25 +15,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     
-    return  MaterialApp(
+    return  const MaterialApp(
       initialRoute: RouteGenerator.homePage,
       onGenerateRoute: RouteGenerator.generateRoute,
-      home: MotherWidget(child: const HomeScreen()),
+      home:  HomeScreen(),
       debugShowMaterialGrid: false,
       debugShowCheckedModeBanner: false,
       showSemanticsDebugger: false,
     );
   }
-}
-class MotherWidget extends InheritedWidget {  
-
-  MotherWidget({Key? key,required Widget child}) : super(child: child,key: key);
-  final AllAccounts account = AllAccounts();
-
-  @override
-  bool updateShouldNotify(covariant InheritedWidget oldWidget) =>true;
-  static MotherWidget of(BuildContext context){
-    return context.dependOnInheritedWidgetOfExactType<MotherWidget>()!;
-    }
-
 }

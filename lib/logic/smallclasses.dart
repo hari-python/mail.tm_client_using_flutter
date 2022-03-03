@@ -9,9 +9,9 @@ class TokenID {
 }
 
 class MailDetails {
-  late final String sender, senderName, subject, emailBody;
-  final Map response;
-  late final bool isRead;
+  late  String sender, senderName, subject, emailBody;
+  Map response;
+  late  bool isRead;
 
   MailDetails(this.response) {
     emailBody = response["html"][0];
